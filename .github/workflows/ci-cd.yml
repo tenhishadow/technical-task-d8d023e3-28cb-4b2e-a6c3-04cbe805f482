@@ -62,6 +62,7 @@ jobs:
       #     name: test-results
       #     path: path/to/junit.xml
   build:
+    needs: test
     runs-on: ubuntu-latest
     permissions:
       contents: read
