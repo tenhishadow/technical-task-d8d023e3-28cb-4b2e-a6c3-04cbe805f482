@@ -104,8 +104,7 @@ jobs:
       - name: Update image in Kubernetes manifest
         run: |
           IMAGE="ghcr.io/${{ github.repository }}:${{ github.sha }}"
-          echo "Using image: $IMAGE"
-          yq -y -i ".spec.template.spec.containers[].image = \"${IMAGE}\"" .k8s/deploy.yml
+          yq eval -i ".spec.template.spec.containers[].image = \"${IMAGE}\"" .k8s/deploy.yml
           git diff
 
 
