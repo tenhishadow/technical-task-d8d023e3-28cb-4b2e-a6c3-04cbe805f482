@@ -1,0 +1,23 @@
+--- # for development only
+
+version: "3.8"
+services:
+  app:
+    build: .
+    dockerfile: Dockerfile
+    ports:
+      - "8085:8085"
+    # volumes:# example
+    #   - .:/app:rw
+    environment:
+      ENV:             "local"
+      PORT:            8085
+      LOG_LEVEL:       "debug"
+      DATABASE_URL:    "sqlite://memory" # replace with additional in docker compose
+      TIMEOUT_SECONDS: '0'
+    read_only: true
+    healthcheck:
+      test:     ["CMD-SHELL", "timeout 5 bash -c '</dev/tcp/localhost/8085'"]
+      interval: 10s
+      timeout:  3s
+      retries:  3

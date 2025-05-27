@@ -1,0 +1,26 @@
+---
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class:                    nginx
+    nginx.ingress.kubernetes.io/cors-allow-headers: X-Forwarded-For
+    nginx.ingress.kubernetes.io/enable-http2:       "true"
+    nginx.ingress.kubernetes.io/ssl-redirect:       "false" # just test
+  name: ingress
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: technical-task-d8d023e3-28cb-4b2e-a6c3-04cbe805f482.domain
+      http:
+        paths:
+          - backend:
+              service:
+                name: technical-task-d8d023e3-28cb-4b2e-a6c3-04cbe805f482
+                port:
+                  number: 80
+            path: /
+            pathType: Prefix
+
+...
