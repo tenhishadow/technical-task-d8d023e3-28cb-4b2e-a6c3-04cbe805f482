@@ -12,6 +12,7 @@ if env is None:
 # allow reload only for local env
 RELOAD = env == "local"
 
+port = int(os.getenv("PORT", "8085"))
 log_level = os.getenv("LOG_LEVEL", "info")
 database_url = os.getenv("DATABASE_URL", "sqlite://memory")
 timeout_seconds = int(os.getenv("TIMEOUT_SECONDS", "30"))
@@ -41,4 +42,4 @@ async def create_data(item: dict):
     return {"received": item}
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8085, reload=RELOAD, log_level=log_level)
+    uvicorn.run("main:app", host="0.0.0.0", port=port, reload=RELOAD, log_level=log_level)
