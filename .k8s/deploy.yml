@@ -9,7 +9,8 @@ metadata:
 spec:
   replicas: 1
   selector:
-    app: technical-task-d8d023e3-28cb-4b2e-a6c3-04cbe805f482
+    matchLabels:
+      app: technical-task-d8d023e3-28cb-4b2e-a6c3-04cbe805f482
   template:
     metadata:
       labels:
