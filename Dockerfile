@@ -1,5 +1,7 @@
 FROM python:3.13-slim
 
+ARG UID=1000
+
 ENV PORT="8085" \
     USER="app" \
     USER_HOME="/app" \
@@ -10,7 +12,10 @@ ENV PORT="8085" \
 # system
 RUN pip install --upgrade pip pipenv --no-cache-dir \
     && mkdir -p ${USER_HOME} \
-    && useradd --system --home-dir $USER_HOME --shell /usr/sbin/nologin ${USER} \
+    && groupadd --gid ${UID} ${USER} \
+    && useradd --uid ${UID} --gid ${UID} \
+       --home-dir ${USER_HOME} \
+       --shell /usr/sbin/nologin ${USER} \
     && chown ${USER}:${USER} ${USER_HOME}
 
 # user
