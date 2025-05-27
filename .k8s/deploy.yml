@@ -18,7 +18,11 @@ spec:
     spec:
       containers:
         - name: app
-          image: "ghcr.io/tenhishadow/technical-task-d8d023e3-28cb-4b2e-a6c3-04cbe805f482:fe444251b1e0428c42ebb57c0c89cf71ffefc9a0"
+          image: "ghcr.io/tenhishadow/technical-task-d8d023e3-28cb-4b2e-a6c3-04cbe805f482:022b7915b93acba7846103c14e23abe540ff12aa"
+          securityContext:
+            runAsNonRoot:             true
+            runAsUser:                1000
+            allowPrivilegeEscalation: false
           resources:
             requests:
               cpu:    "100m"
@@ -26,5 +30,40 @@ spec:
             limits:
               cpu:    "250m"
               memory: "512Mi"
-
+          env:
+            - name: ENV
+              value: "prod"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: TIMEOUT_SECONDS
+              value: '0'
+            - name: PORT
+              value: '9090'
+          ports:
+            - name: app
+              containerPort: 9090
+          readinessProbe:
+            httpGet:
+              path: /ready
+              port: app
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            failureThreshold: 3
+            timeoutSeconds: 2
+            successThreshold: 1
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: app
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            failureThreshold: 5
+            timeoutSeconds: 2
+          startupProbe:
+            httpGet:
+              path: /health
+              port: app
+            periodSeconds: 2
+            failureThreshold: 30
+            timeoutSeconds: 2
 ...
