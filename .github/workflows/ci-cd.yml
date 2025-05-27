@@ -106,10 +106,15 @@ jobs:
           IMAGE="ghcr.io/${{ github.repository }}:${{ github.sha }}"
           yq eval -i ".spec.template.spec.containers[].image = \"${IMAGE}\"" .k8s/deploy.yml
           git diff
-      - name: Commit and push changes
+      - name: Commit and push changes if needed
         run: |
           git config user.name "GitHub Actions"
           git config user.email "actions@example.com"
           git add .k8s/deploy.yml
-          git commit -m "[ci skip] k8s: update image to $IMAGE"
-          git push origin HEAD
+
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "[ci skip] k8s: update image to ghcr.io/${{ github.repository }}:${{ github.sha }}"
+            git push origin HEAD
+          fi
