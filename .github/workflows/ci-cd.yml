@@ -1,0 +1,95 @@
+---
+
+name: ci-cd
+
+on:
+  push:
+    branches:
+      - "main"
+      - "dev"
+    paths-ignore:
+      - '.gitignore'
+      - 'LICENSE'
+      - 'README.md'
+  pull_request:
+    branches:
+      - "main"
+    paths-ignore:
+      - '.gitignore'
+      - 'LICENSE'
+      - 'README.md'
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      # - name: Scan Code Base
+      #   uses: github/super-linter/slim@v7
+      #   env:
+      #     VALIDATE_ALL_CODEBASE: true
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: deps | python version
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - name: cache | pip
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: deps | install pipenv
+        run: |
+          python -m pip install --upgrade pip
+          pip install pipenv
+      - name: deps | pipenv install
+        run: pipenv install --dev --deploy --ignore-pipfile
+      - name: run tests
+        run: pipenv run test
+      # in case of Junit
+      # - name: Upload test results
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: test-results
+      #     path: path/to/junit.xml
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      - name: Log in to the Container registry
+        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          tags: ghcr.io/${{ github.repository }}:${{ github.sha }}
+      # just example
+      # - name: Scan Docker image
+      #   uses: aquasecurity/trivy-action@v0.13.1
+      #   with:
+      #     image-ref: ghcr.io/${{ github.repository }}:${{ github.sha }}
+      #     format: table
+      #     exit-code: 1
+      #     vuln-type: os,library
+
