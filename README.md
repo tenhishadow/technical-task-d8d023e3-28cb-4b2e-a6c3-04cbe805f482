@@ -71,3 +71,9 @@ LOG_LEVEL="debug"
 DATABASE_URL="sqlite://memory"
 TIMEOUT_SECONDS="0"
 ```
+
+## Local development with Docker
+
+```bash
+docker-compose up --build
+```
